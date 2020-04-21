@@ -2,7 +2,7 @@
 #	Title: Obfuscater					#
 #	Author: Thomas Higgs				#
 #	Purpose: Data obfuscation			#
-#	Last update: 25/02/2020				#
+#	Last update: 21/04/2020				#
 #	Version: 7.0						#
 #	To do Next: - Clear password var 	#
 #########################################
@@ -27,16 +27,16 @@ from datetime import datetime
 
 # Function to read file contents (used by both classes) #
 def fileread(file):
-	global Content 
+	global content 
 	with open(file, 'rb') as f:	# Function to read file contents as bytes #
-		Content = f.read()
+		content = f.read()
 		f.close()
 
 # Function to get current time (used by both classes) #
 def gettime():
-	global CurrentTime
-	CurrentTime = datetime.now()
-	CurrentTime = str(CurrentTime)
+	global current_time
+	current_time = datetime.now()
+	current_time = str(current_time)
 
 # Function to check if a file exists & is accessible #
 def pathcheck(file):
@@ -57,11 +57,11 @@ def pathcheck(file):
 		return
 
 # Function to clear passwords from memory (used by both classes) #
-def clear(Pass, password, key):
+def clear(passwd, password, key):
 	char = "*"
-	for elem in Pass:
+	for elem in passwd:
 		char = char + "*"
-	Pass = char * 2
+	passwd = char * 2
 	for elem in password:
 		char = char + "*"
 	password = char * 2
@@ -78,10 +78,10 @@ class Application(Frame):										# Func to build notebook #
 		self.notebook.grid(row=0)
 
 	def add_tab(self):											# Func to add GUI frames #
-		Tb1 = EmTb(self.notebook)								
-		self.notebook.add(Tb1, text="Embed")
-		Tb2 = ExTb(self.notebook)
-		self.notebook.add(Tb2, text="Extract")
+		tb1 = EmTb(self.notebook)								
+		self.notebook.add(tb1, text="Embed")
+		tb3 = ExTb(self.notebook)
+		self.notebook.add(tb3, text="Extract")
 		Tb3 = HelpTb(self.notebook)
 		self.notebook.add(Tb3, text="Help")
 		self.notebook.pack(expand=0, fill="both")
@@ -93,209 +93,216 @@ class EmTb(Frame):
 		self.style = ttk.Style()
 		self.style.theme_create("AppStyle", parent="alt", settings={"TNotebook.Tab": {"configure":{"padding": [10,10], "background": "#F0F0F0"},}})
 		self.style.theme_use("AppStyle") 
-		self.Titlefont = tkFont.Font(self, family="Helvetica", size=20)
-		self.EmTitl = tk.Label(self, text="Embed", font=self.Titlefont, bg="#F0F0F0")	
-		self.EmTitl.grid(row=0, column=0, padx=202, pady=10)
+		self.titlefont = tkFont.Font(self, family="Helvetica", size=20)
+		self.emtitl = tk.Label(self, text="Embed", font=self.titlefont, bg="#F0F0F0")	
+		self.emtitl.grid(row=0, column=0, padx=202, pady=10)
 
-		self.CfilLb = tk.Label(self, text="Cover File: ", bg="#F0F0F0")	# Cover file input #
-		self.CfilLb.place(x=15, y=55)
-		self.CfilEn = tk.Entry(self)
-		self.CfilEn.place(x=15, y=85, width=465)
+		self.cfil_lb = tk.Label(self, text="Cover File: ", bg="#F0F0F0")	# Cover file input #
+		self.cfil_lb.place(x=15, y=55)
+		self.cfilen = tk.Entry(self)
+		self.cfilen.place(x=15, y=85, width=465)
 
-		self.HfilLb = tk.Label(self, text="Hidden File: ", bg="#F0F0F0")	# Hidden file input #
-		self.HfilLb.place(x=15, y=125)
-		self.HfilEn = tk.Entry(self)
-		self.HfilEn.place(x=15, y=155, width=465)
+		self.hfil_lb = tk.Label(self, text="Hidden File: ", bg="#F0F0F0")	# Hidden file input #
+		self.hfil_lb.place(x=15, y=125)
+		self.hfilen = tk.Entry(self)
+		self.hfilen.place(x=15, y=155, width=465)
 
-		EnChoice = [ 'AES', 'DES', 'Blowfish' ]		# Encryption drop down #
-		self.EmDefault = StringVar(self)	
-		self.EmDefault.set('AES')
-		self.EnLb = tk.Label(self, text="Encryption Algorithm: ", bg="#F0F0F0")
-		self.EnLb.place(x=15, y=195)
-		self.EnDrop = OptionMenu(self, self.EmDefault, *EnChoice)
-		self.EnDrop.place(x=15, y=225, width=465)
+		en_choice = [ 'AES', 'DES', 'Blowfish' ]		# encryption drop down #
+		self.emdefault = StringVar(self)	
+		self.emdefault.set('AES')
+		self.en_lb = tk.Label(self, text="Encryption Algorithm: ", bg="#F0F0F0")
+		self.en_lb.place(x=15, y=195)
+		self.en_drop = OptionMenu(self, self.emdefault, *en_choice)
+		self.en_drop.place(x=15, y=225, width=465)
 
-		self.PassLb = tk.Label(self, text="Password: ", bg="#F0F0F0")	 # Password input #
-		self.PassLb.place(x=15, y=285, width=465)
-		self.PassEm = tk.Entry(self, show="*")
-		self.PassEm.place(x=15, y=315, width=465)
+		self.passwd_lb = tk.Label(self, text="Password: ", bg="#F0F0F0")	 # password input #
+		self.passwd_lb.place(x=15, y=285, width=465)
+		self.passwdem = tk.Entry(self, show="*")
+		self.passwdem.place(x=15, y=315, width=465)
 
-		self.Butn = tk.Button(self, text="Embed", command=self.embed)	# Button #
-		self.Butn.place(x=135, y=365, width=232)
+		self.butn = tk.Button(self, text="Embed", command=self.embed)	# Button #
+		self.butn.place(x=135, y=365, width=232)
 
-		self.EmText = tk.Text(self, height=8)		# Text box for log messages #
-		self.EmText.place(x= 15, y= 415, width=465)
-		self.EmText.tag_config('Error', foreground="red")
-		self.EmText.tag_config('Complete', foreground="green")
+		self.emtext = tk.Text(self, height=8)		# Text box for log messages #
+		self.emtext.place(x= 15, y= 415, width=465)
+		self.emtext.tag_config('Error', foreground="red")
+		self.emtext.tag_config('Complete', foreground="green")
 
 	def embed(self):
-		Cfile = self.CfilEn.get()	# Get inputs from widgets #
-		Hfile = self.HfilEn.get()
-		Encryp = self.EmDefault.get()
-		Pass = self.PassEm.get()
+		cfile = self.cfilen.get()	# Get inputs from widgets #
+		hfile = self.hfilen.get()
+		encryp = self.emdefault.get()
+		passwd = self.passwdem.get()
 
-		Flag = 'ENCRYPTE'	# Flag used for decryption check #
+		flag = 'ENCRYPTE'	# flag used for decryption check #
 
-		if Cfile == "":
+		if cfile == "":
 			messagebox.showinfo("Warning", "No cover file given!")
 			gettime()																		
-			self.EmText.insert(tk.END, CurrentTime + ": No cover file given!" + '\n', 'Error')
-
+			self.emtext.insert(tk.END, current_time + ": No cover file given!" + '\n', 'Error')
 			return
 
-		if Hfile == '':
+		if hfile == '':
 			messagebox.showinfo("Warning", "No file to hide given!")
 			gettime()																		
-			self.EmText.insert(tk.END, CurrentTime + ": No hidden file given!" + '\n', 'Error')
+			self.emtext.insert(tk.END, current_time + ": No hidden file given!" + '\n', 'Error')
 			return
 
-		if Pass == "":
+		if passwd == "":
 			messagebox.showinfo("Warning", "No password given!")
 			gettime()																		
-			self.EmText.insert(tk.END, CurrentTime + ": No pasword given!" + '\n', 'Error')
+			self.emtext.insert(tk.END, current_time + ": No pasword given!" + '\n', 'Error')
 			return
 
 		gettime()																
-		self.EmText.insert(tk.END, CurrentTime + ": Reading cover file." + '\n')		# Get contents of both files #
-		file = Cfile 
+		self.emtext.insert(tk.END, current_time + ": Reading cover file." + '\n')		# Get contents of both files #
+		file = cfile 
 		pathcheck(file)
 		if value == 1:
-			self.EmText.insert(tk.END, CurrentTime + ": File in use!" + '\n', 'Error')
+			self.emtext.insert(tk.END, current_time + ": File in use!" + '\n', 'Error')
 			return
 		elif value == 2:
-			self.EmText.insert(tk.END, CurrentTime + ": File could not be found!" + '\n', 'Error')
+			self.emtext.insert(tk.END, current_time + ": File could not be found!" + '\n', 'Error')
 			return
 		fileread(file)
-		CContent = Content
+		ccontent = content
 		gettime()																		
-		self.EmText.insert(tk.END, CurrentTime + ": Reading hidden file." + '\n')
-		file = Hfile
+		self.emtext.insert(tk.END, current_time + ": Reading hidden file." + '\n')
+		file = hfile
 		pathcheck(file)
 		if value == 1:
-			self.EmText.insert(tk.END, CurrentTime + ": File in use!" + '\n', 'Error')
+			self.emtext.insert(tk.END, current_time + ": File in use!" + '\n', 'Error')
 			return
 		elif value == 2:
-			self.EmText.insert(tk.END, CurrentTime + ": File could not be found!" + '\n', 'Error')
+			self.emtext.insert(tk.END, current_time + ": File could not be found!" + '\n', 'Error')
 			return
 		fileread(file)
-		HContent = Content 
+		hcontent = content 
 
 		gettime()																	# Perform password check #														
-		self.EmText.insert(tk.END, CurrentTime + ": Checking password." + '\n')
-		password = Pass.encode()			
-		self.CheckPassword(password)
+		self.emtext.insert(tk.END, current_time + ": Checking password." + '\n')
+		password = passwd.encode()			
+		self.check_password(password)
 
-		if self.Value == 1:				# If password fails #
+		if self.value == 1:				# If password fails #
 			gettime()																		
-			self.EmText.insert(tk.END, CurrentTime + ": Password did not meet requirements!" + '\n', 'Error')
-			self.PassEm.delete(0, 'end')
+			self.emtext.insert(tk.END, current_time + ": password did not meet requirements!" + '\n', 'Error')
+			self.passwdem.delete(0, 'end')
 			return
 
 		gettime()																		
-		self.EmText.insert(tk.END, CurrentTime + ": Encrypting data." + '\n')
+		self.emtext.insert(tk.END, current_time + ": encrypting data." + '\n')
 
-		if Encryp == 'AES':			# Encryption #
+		if encryp == 'AES':			# encryption #
 			salt = 'salt'.encode()		
 			key = hashlib.pbkdf2_hmac('sha256', password, salt, 100000)
 			IV = 16 * '\x00'
 			mode = AES.MODE_CFB
 			encryptor = AES.new(key, mode, IV=IV)
-			Flag = encryptor.encrypt(Flag)
-			HContent = encryptor.encrypt(HContent)
-		elif Encryp == 'DES':
-			HContent = self.pad(HContent)
+			flag = encryptor.encrypt(flag)
+			hcontent = encryptor.encrypt(hcontent)
+		elif encryp == 'DES':
+			hcontent = self.pad(hcontent)
 			salt = 'salt'.encode()		
 			key = hashlib.pbkdf2_hmac('sha256', password, salt, 100000)	
 			key = key[:8]													# Generate sha256 hash and then take first 8 bytes and use as key #
 			IV =  "........"
 			mode = DES.MODE_CFB
 			encryptor = DES.new(key, mode, IV=IV)
-			Flag = encryptor.encrypt(Flag)
-			HContent = encryptor.encrypt(HContent)
-		elif Encryp == 'Blowfish':
-			HContent = self.pad(HContent)
+			flag = encryptor.encrypt(flag)
+			hcontent = encryptor.encrypt(hcontent)
+		elif encryp == 'Blowfish':
+			hcontent = self.pad(hcontent)
 			salt = 'salt'.encode()	
 			key = hashlib.pbkdf2_hmac('sha256', password, salt, 100000)
 			IV = 8 * '\x00'
 			mode = Blowfish.MODE_CFB
 			encryptor = Blowfish.new(key, mode, IV=IV)
-			Flag = encryptor.encrypt(Flag)
-			HContent = encryptor.encrypt(HContent)
+			flag = encryptor.encrypt(flag)
+			hcontent = encryptor.encrypt(hcontent)
 
 		gettime()																	# Calculate file length #																	
-		self.EmText.insert(tk.END, CurrentTime + ": Checking file length." + '\n')
-		length = len(CContent) + len(HContent) + len(Flag) + 4
+		self.emtext.insert(tk.END, current_time + ": Checking file length." + '\n')
+		length = len(ccontent) + len(hcontent) + len(flag) + 4
 
 		if length % 512 == 0:					# Checking if file can be divided by 512 #
 			gettime()																											
-			self.EmText.insert(tk.END, CurrentTime + ": Adding padding." + '\n')
-			HContent = HContent + b'\x00'
+			self.emtext.insert(tk.END, current_time + ": Adding padding." + '\n')
+			hcontent = hcontent + b'\x00'
 
-		percent = (length - len(CContent))/len(CContent)*100		# Calculate difference in file size #
+		percent = (length - len(ccontent))/len(ccontent)*100		# Calculate difference in file size #
 		if percent > 100:
 			message = messagebox.askquestion("Warning", "The hidden file's size will be considerably larger than the cover file after this operation. This may make your hidden file stand out.\n\nConsider using a larger cover file or compress your hidden file.\n\nDo you want to continue anyway?")
 			if message == 'no':
 				gettime()																	# Abort #																	
-				self.EmText.insert(tk.END, CurrentTime + ": Operation aborted." + '\n', 'Error')
+				self.emtext.insert(tk.END, current_time + ": Operation aborted." + '\n', 'Error')
 				return
 
 		gettime()																	# Overwriting file #																	
-		self.EmText.insert(tk.END, CurrentTime + ": Overwriting file." + '\n')
-		self.EmWrite(Hfile, CContent, HContent, Flag)	
+		self.emtext.insert(tk.END, current_time + ": Overwriting file." + '\n')
+		self.em_write(hfile, ccontent, hcontent, flag)	
 
-		gettime()																	# Chaning extenstion #																	
-		self.EmText.insert(tk.END, CurrentTime + ": Chaning extenstion." + '\n')
-		null, extenstion = Cfile.split('.', 1) 			
-		if re.match('^[^.]*$', Hfile):
-			name = Hfile
+		gettime()																	# Chaning extension #																	
+		self.emtext.insert(tk.END, current_time + ": Chaning extension." + '\n')
+		null, extension = cfile.split('.', 1) 			
+		if re.match('^[^.]*$', hfile):
+			name = hfile
 		else:
-			name, null = Hfile.split('.', 1)
-		os.rename(Hfile, name + '.' + extenstion)
+			name, null = hfile.split('.', 1)
+		new_name = name + "." + extension
+		
+		try:
+			os.rename(hfile, name + '.' + extension)
+		except WindowsError:
+			messagebox.showinfo("Warning", "The file: " + new_name +" already exists!\nPlease rename your hidden file.")
+			gettime()
+			self.emtext.insert(tk.END, current_time + ": File already exists!" + '\n', 'Error')
+			return
 
 		gettime()																																		
-		self.EmText.insert(tk.END, CurrentTime + ": Operation complete!" + '\n', 'Complete')
+		self.emtext.insert(tk.END, current_time + ": Operation complete!" + '\n', 'Complete')
 
-		self.CfilEn.delete(0, 'end')	# Reset widgets #
-		self.HfilEn.delete(0, 'end')
-		self.PassEm.delete(0, 'end')
-		clear(Pass, password, key)
+		self.cfilen.delete(0, 'end')	# Reset widgets #
+		self.hfilen.delete(0, 'end')
+		self.passwdem.delete(0, 'end')
+		clear(passwd, password, key)
 
-	def CheckPassword(self, password):	# Checking the length of passwords #
+	def check_password(self, password):	# Checking the length of passwords #
 		if len(password) < 8:
 			messagebox.showinfo("Warning", "The supplied password is very weak!\nConsider using a longer password.")
-			self.Value = 1
+			self.value = 1
 		elif password.islower():
 			messagebox.showinfo("Warning", "The supplied password is very weak!\nConsider using a mix of upper and lower case characters.")
-			self.Value = 1
+			self.value = 1
 		elif password.isalnum():
 			messagebox.showinfo("Warning", "The supplied password is very weak!\nConsider using non alphanumeric characters.")
-			self.Value = 1
+			self.value = 1
 		elif re.match(b'[a-zA-Z]', password) is None:
 			messagebox.showinfo("Warning", "The supplied password is very weak!\nConsider using a mix of alphabetic characters and numbers.")
-			self.Value = 1
+			self.value = 1
 		else:
-			self.Value = 0
+			self.value = 0
 
-	def EmWrite(self, Hfile, CContent, HContent, Flag): 	# Func to overwrite file #
-		with open (Hfile, 'wb') as f:	
-			f.write(CContent)
+	def em_write(self, hfile, ccontent, hcontent, flag): 	# Func to overwrite file #
+		with open (hfile, 'wb') as f:	
+			f.write(ccontent)
 			f.close()
-		with open (Hfile, 'ab') as f:
+		with open (hfile, 'ab') as f:
 			f.write(b"\x23\x23\x23\x23")
 			f.close()
-		with open (Hfile, 'ab') as f:
-			f.write(Flag)
+		with open (hfile, 'ab') as f:
+			f.write(flag)
 			f.close()
-		with open (Hfile, 'ab') as f:
-			f.write(HContent)
+		with open (hfile, 'ab') as f:
+			f.write(hcontent)
 			f.close()
 
-	def pad(self, HContent):
-		while len(HContent) % 8 != 0:				# Paading for 8 bit encryption #
+	def pad(self, hcontent):
+		while len(hcontent) % 8 != 0:				# Paading for 8 bit encryption #
 			gettime()																											
-			self.EmText.insert(tk.END, CurrentTime + ": Adding padding." + '\n')
-			HContent += b' '
-		return HContent
+			self.emtext.insert(tk.END, current_time + ": Adding padding." + '\n')
+			hcontent += b' '
+		return hcontent
 
 # EmTb class #
 class ExTb(Frame):
@@ -303,143 +310,143 @@ class ExTb(Frame):
 		Frame.__init__(self, *args, **kwargs)
 		self.style = ttk.Style()
 		self.style.theme_use("AppStyle") 
-		self.Titlefont = tkFont.Font(self, family="Helvetica", size=20)
-		self.ExTitl = tk.Label(self, text="Extract", font=self.Titlefont, bg="#F0F0F0")	
-		self.ExTitl.grid(row=0, column=0, padx=202, pady=10)
+		self.titlefont = tkFont.Font(self, family="Helvetica", size=20)
+		self.extitl = tk.Label(self, text="Extract", font=self.titlefont, bg="#F0F0F0")	
+		self.extitl.grid(row=0, column=0, padx=202, pady=10)
 
-		self.EfilLb = tk.Label(self, text="File: ", bg="#F0F0F0")	# File input #
-		self.EfilLb.place(x=15, y=55)
-		self.EfilEn = tk.Entry(self)
-		self.EfilEn.place(x=15, y=85, width=465)
+		self.efil_lb = tk.Label(self, text="File: ", bg="#F0F0F0")	# File input #
+		self.efil_lb.place(x=15, y=55)
+		self.efilen = tk.Entry(self)
+		self.efilen.place(x=15, y=85, width=465)
 
-		self.ExtenLb = tk.Label(self, text="Extenstion: ", bg="#F0F0F0")	# Extenstion file input #
-		self.ExtenLb.place(x=15, y=125)
-		self.ExtenEn = tk.Entry(self)
-		self.ExtenEn.place(x=15, y=155, width=465)
+		self.exten_lb = tk.Label(self, text="Extension: ", bg="#F0F0F0")	# extension file input #
+		self.exten_lb.place(x=15, y=125)
+		self.extenen = tk.Entry(self)
+		self.extenen.place(x=15, y=155, width=465)
 
-		EnChoice = [ 'AES', 'DES', 'Blowfish' ]		# Decryption drop down #
-		self.ExDefault = StringVar(self)	
-		self.ExDefault.set('AES')
-		self.EnLb = tk.Label(self, text="Encryption Algorithm: ", bg="#F0F0F0")	
-		self.EnLb.place(x=15, y=195)
-		self.EnDrop = OptionMenu(self, self.ExDefault, *EnChoice)
-		self.EnDrop.place(x=15, y=225, width=465)
+		en_choice = [ 'AES', 'DES', 'Blowfish' ]		# Decryption drop down #
+		self.exdefault = StringVar(self)	
+		self.exdefault.set('AES')
+		self.en_lb = tk.Label(self, text="Encryption Algorithm: ", bg="#F0F0F0")	
+		self.en_lb.place(x=15, y=195)
+		self.en_drop = OptionMenu(self, self.exdefault, *en_choice)
+		self.en_drop.place(x=15, y=225, width=465)
 
-		self.PassLb = tk.Label(self, text="Password: ", bg="#F0F0F0") 	# Password input #
-		self.PassLb.place(x=15, y=285, width=465)
-		self.PassEx = tk.Entry(self, show="*")
-		self.PassEx.place(x=15, y=315, width=465)
+		self.passwdLb = tk.Label(self, text="Password: ", bg="#F0F0F0") 	# password input #
+		self.passwdLb.place(x=15, y=285, width=465)
+		self.passwdex = tk.Entry(self, show="*")
+		self.passwdex.place(x=15, y=315, width=465)
 
-		self.Butn = tk.Button(self, text="Extract", command=self.Extract)	# Button #
-		self.Butn.place(x=135, y=365, width=232)
+		self.butn = tk.Button(self, text="Extract", command=self.extract)	# Button #
+		self.butn.place(x=135, y=365, width=232)
 
-		self.ExText = tk.Text(self, height=8)		# Text box for logs #
-		self.ExText.place(x= 15, y= 415, width=465)
-		self.ExText.tag_config('Error', foreground="red")
-		self.ExText.tag_config('Complete', foreground="green")
+		self.extext = tk.Text(self, height=8)		# Text box for logs #
+		self.extext.place(x= 15, y= 415, width=465)
+		self.extext.tag_config('Error', foreground="red")
+		self.extext.tag_config('Complete', foreground="green")
 
-	def Extract(self):
-		Efile = self.EfilEn.get()		# Get all inputs from widgets #
-		Extenstion = self.ExtenEn.get()
-		Encryp = self.ExDefault.get()
-		Pass = self.PassEx.get()
+	def extract(self):
+		efile = self.efilen.get()		# Get all inputs from widgets #
+		extension = self.extenen.get()
+		decryp = self.exdefault.get()
+		passwd = self.passwdex.get()
 
-		if Efile == '':
+		if efile == '':
 			messagebox.showinfo("Warning", "No file given!")
 			gettime()																		
-			self.ExText.insert(tk.END, CurrentTime + ": No file given!" + '\n', 'Error')
+			self.extext.insert(tk.END, current_time + ": No file given!" + '\n', 'Error')
 			return
 
-		if Extenstion == '':
+		if extension == '':
 			messagebox.showinfo("Warning", "No extension given!")
 			gettime()																		
-			self.ExText.insert(tk.END, CurrentTime + ": No extension given!" + '\n', 'Error')
+			self.extext.insert(tk.END, current_time + ": No extension given!" + '\n', 'Error')
 			return
 
-		if Pass == '':
+		if passwd == '':
 			messagebox.showinfo("Warning", "No password given!")
 			gettime()																		
-			self.ExText.insert(tk.END, CurrentTime + ": No pasword given!" + '\n', 'Error')
+			self.extext.insert(tk.END, current_time + ": No pasword given!" + '\n', 'Error')
 			return
 
 		gettime()																 # Get contents of file #
-		self.ExText.insert(tk.END, CurrentTime + ": Reading File." + '\n')
-		file = Efile 	
+		self.extext.insert(tk.END, current_time + ": Reading File." + '\n')
+		file = efile 	
 		pathcheck(file)
 		if value == 1:
-			self.EmText.insert(tk.END, CurrentTime + ": File in use!" + '\n', 'Error')
+			self.emtext.insert(tk.END, current_time + ": File in use!" + '\n', 'Error')
 			return
 		elif value == 2:
-			self.EmText.insert(tk.END, CurrentTime + ": File could not be found!" + '\n', 'Error')
+			self.emtext.insert(tk.END, current_time + ": File could not be found!" + '\n', 'Error')
 			return
 		fileread(file)
-		EContent = Content
+		econtent = content
 
-		pos = EContent.find(b'\x23\x23\x23\x23')	# Find marker and remove prior data #
+		pos = econtent.find(b'\x23\x23\x23\x23')	# Find marker and remove prior data #
 		length = 400000000
-		data = EContent[pos:pos+length]
+		data = econtent[pos:pos+length]
 		data = re.sub(b"(\x23\x23\x23\x23)", b'', data)
 
-		Ciphertext = data 		# Asigning data to new variable #
-		password = Pass.encode()
+		cipher_text = data 		# Asigning data to new variable #
+		password = passwd.encode()
 
 		gettime()																											
-		self.ExText.insert(tk.END, CurrentTime + ": Decrypting file." + '\n')
+		self.extext.insert(tk.END, current_time + ": Decrypting file." + '\n')
 
-		if Encryp == 'AES':				# Decryption #
+		if decryp == 'AES':				# Decryption #
 			salt = 'salt'.encode()
 			key = hashlib.pbkdf2_hmac('sha256', password, salt, 100000)
 			IV = 16 * '\x00'
 			mode = AES.MODE_CFB
 			decryptor = AES.new(key, mode, IV=IV)
-			Newdata = decryptor.decrypt(Ciphertext)
-		elif Encryp == 'DES':
+			new_data = decryptor.decrypt(cipher_text)
+		elif decryp == 'DES':
 			salt = 'salt'.encode()		
 			key = hashlib.pbkdf2_hmac('sha256', password, salt, 100000)
 			key = key[:8]													# Generate sha256 hash and then take first 8 bytes and use as key #
 			mode = DES.MODE_CFB
 			decryptor = DES.new(key, DES.MODE_ECB)
-			Newdata = decryptor.decrypt(Ciphertext)
-		elif Encryp == "Blowfish":
+			new_data = decryptor.decrypt(cipher_text)
+		elif decryp == "Blowfish":
 			salt = 'salt'.encode()
 			key = hashlib.pbkdf2_hmac('sha256', password, salt, 100000)
 			IV = 8 * '\x00'
 			mode = Blowfish.MODE_CFB
 			decryptor = Blowfish.new(key, mode, IV=IV)
-			Newdata = decryptor.decrypt(Ciphertext)
+			new_data = decryptor.decrypt(cipher_text)
 
 		gettime()																										
-		self.ExText.insert(tk.END, CurrentTime + ": Verifying decryption." + '\n')
+		self.extext.insert(tk.END, current_time + ": Verifying decryption." + '\n')
 
-		if re.match(b'^ENCRYPTE', Newdata):				# Check decryption #
-			Newdata = re.sub(b"ENCRYPTE", b'', Newdata)
+		if re.match(b'^ENCRYPTE', new_data):				# Check decryption #
+			new_data = re.sub(b"ENCRYPTE", b'', new_data)
 		else:
 			messagebox.showinfo("Warning", "Incorrect password!")
 			gettime()																										
-			self.ExText.insert(tk.END, CurrentTime + ": Incorrect password!" + '\n', 'Error')
-			self.PassEx.delete(0, 'end')
+			self.extext.insert(tk.END, current_time + ": Incorrect password!" + '\n', 'Error')
+			self.passwdEx.delete(0, 'end')
 			return		
 
 		gettime()																	# Overwrite file # 																				
-		self.ExText.insert(tk.END, CurrentTime + ": Overwriting file." + '\n')
-		self.ExWrite(Efile, Newdata) 		
+		self.extext.insert(tk.END, current_time + ": Overwriting file." + '\n')
+		self.exwrite(efile, new_data) 		
 
 		gettime()																	# Change extension # 																				
-		self.ExText.insert(tk.END, CurrentTime + ": Changing extension." + '\n')
-		name, null = Efile.split('.', 1)			
-		os.rename(Efile, name + '.' + Extenstion)
+		self.extext.insert(tk.END, current_time + ": Changing extension." + '\n')
+		name, null = efile.split('.', 1)			
+		os.rename(efile, name + '.' + extension)
 
 		gettime()																																		
-		self.ExText.insert(tk.END, CurrentTime + ": Operation complete!" + '\n', 'Complete')
+		self.extext.insert(tk.END, current_time + ": Operation complete!" + '\n', 'Complete')
 
-		self.EfilEn.delete(0, 'end')	# Reset all inputs #
-		self.ExtenEn.delete(0, 'end')
-		self.PassEx.delete(0, 'end')
-		clear(Pass, password, key)
+		self.efilen.delete(0, 'end')	# Reset all inputs #
+		self.extenEn.delete(0, 'end')
+		self.passwdEx.delete(0, 'end')
+		clear(passwd, password, key)
 
-	def ExWrite(self, Efile, Newdata):
-		with open(Efile, 'wb') as f:	# Function to overwrite file with extracted data #
-			f.write(Newdata)
+	def exwrite(self, efile, new_data):
+		with open(efile, 'wb') as f:	# Function to overwrite file with extracted data #
+			f.write(new_data)
 			f.close()
 
 class HelpTb(Frame):
@@ -447,32 +454,32 @@ class HelpTb(Frame):
 		Frame.__init__(self, *args, **kwargs)
 		self.style = ttk.Style()
 		self.style.theme_use("AppStyle") 
-		self.Titlefont = tkFont.Font(self, family="Helvetica", size=20)
-		self.Subtitlefont = tkFont.Font(self, family="Helvetica", size=14)
-		self.HlTitl = tk.Label(self, text="Help", font=self.Titlefont, bg="#F0F0F0")	
-		self.HlTitl.grid(row=0, column=0, padx=220, pady=10)
+		self.titlefont = tkFont.Font(self, family="Helvetica", size=20)
+		self.subtitlefont = tkFont.Font(self, family="Helvetica", size=14)
+		self.hltitl = tk.Label(self, text="Help", font=self.titlefont, bg="#F0F0F0")	
+		self.hltitl.grid(row=0, column=0, padx=220, pady=10)
 
-		self.HlEmTitl = tk.Label(self, text="Embedding data", font=self.Subtitlefont, bg="#F0F0F0")	
-		self.HlEmTitl.place(x=15, y=55)		
-		self.HlEm = tk.Label(self, text='''This system allows you to protect files by making them appear and function like other \nfiles.
+		self.hlemtitl = tk.Label(self, text="Embedding data", font=self.subtitlefont, bg="#F0F0F0")	
+		self.hlemtitl.place(x=15, y=55)		
+		self.hlem = tk.Label(self, text='''This system allows you to protect files by making them appear and function like other \nfiles.
 											\nFor example you may have an important text document you wish to protect. Using this \nsystem you are can make that text document look and run like an .mp4 file.
 											\nTo do this navigate to the "Embed" tab using the buttons along the top. Then enter a \nfile you want your hidden file to look like. This is called a cover file. Next enter the \nfile path of the file you wish to hide. Then choose an encryption algorigthm.\nAES is the most commonly used algorithm supported by this system and is the \nstrongest. Finally choose a strong password and click the "Embed" button.
 											\nThe system will then encrypt your hidden file and add the cover file to the begining.
 											\nPlease note this system does not store passwords. Data will be unrecoverable if \npasswords are forgotten!''', bg="#F0F0F0", anchor='w', justify='left')
-		self.HlEm.place(x=15, y=85, width=465)
+		self.hlem.place(x=15, y=85, width=465)
 
-		self.HlExTitl = tk.Label(self, text="Extracting data", font=self.Subtitlefont, bg="#F0F0F0")	
-		self.HlExTitl.place(x=15, y=350)	
-		self.HlEx = tk.Label(self, text='''To recover data first, navigate to the "Extract" tab using the buttons along the top.\nThen enter the file you wish to extract data from. Next enter the original file's extension.\nIf the file had no extension then leave this field blank. Then choose the encryption \nalgorighm used to encrypt the original data. Finally enter the password which was used \nto embed the orginal data and press the "Extract" button.
+		self.hlextitl = tk.Label(self, text="Extracting data", font=self.subtitlefont, bg="#F0F0F0")	
+		self.hlextitl.place(x=15, y=350)	
+		self.hlEx = tk.Label(self, text='''To recover data first, navigate to the "Extract" tab using the buttons along the top.\nThen enter the file you wish to extract data from. Next enter the original file's extension.\nIf the file had no extension then leave this field blank. Then choose the encryption \nalgorighm used to encrypt the original data. Finally enter the password which was used \nto embed the orginal data and press the "Extract" button.
 											\nFiles will not be returned if incorrect passwords or algorithms are used.''', bg="#F0F0F0", anchor='w', justify='left')
-		self.HlEx.place(x=15, y=380, width=465)
+		self.hlEx.place(x=15, y=380, width=465)
 
-		self.Vidtx = tk.Label(self, text="If you require more help, a tutorial can be found here: ", font=self.Subtitlefont, bg="#F0F0F0")	
-		self.Vidtx.place(x=15, y=510)
+		self.vidtx = tk.Label(self, text="If you require more help, a tutorial can be found here: ", font=self.subtitlefont, bg="#F0F0F0")	
+		self.vidtx.place(x=15, y=510)
 
-		self.Vidlnk = Label(self, text="https://youtu.be/4Nkk1Gv7KD0", fg="blue", cursor="hand2")
-		self.Vidlnk.place(x=140, y=540)
-		self.Vidlnk.bind("<Button-1>", self.link)
+		self.vidlnk = Label(self, text="https://youtu.be/4Nkk1Gv7KD0", fg="blue", cursor="hand2")
+		self.vidlnk.place(x=140, y=540)
+		self.vidlnk.bind("<Button-1>", self.link)
 
 	def link(self, event):
 		webbrowser.open_new('https://youtu.be/4Nkk1Gv7KD0')
